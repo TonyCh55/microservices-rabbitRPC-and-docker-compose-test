@@ -1,0 +1,69 @@
+version: "3.9"
+services:
+  client:
+    container_name: "rabbit_client_and_gateway"
+    build:
+      context: rabbit_client_and_gateway
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3001
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RPC_QUEUE_NAME=rpcQueue
+      - REPLY_QUEUE_NAME=replyQueue
+    ports:
+      - 3001:3001
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    links:
+      - redis
+      - rabbitmq
+
+  server:
+    container_name: "rabbit_server"
+    build:
+      context: rabbit_server
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RPC_QUEUE_NAME=rpcQueue
+      - REPLY_QUEUE_NAME=replyQueue
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    links:
+      - redis
+      - rabbitmq
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 1s
+      timeout: 3s
+      retries: 30
