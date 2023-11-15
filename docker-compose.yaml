@@ -15,6 +15,7 @@ services:
       - REPLY_QUEUE_NAME=replyQueue
     ports:
       - 3001:3001
+    restart: unless-stopped
     depends_on:
       redis:
         condition: service_healthy
@@ -36,6 +37,7 @@ services:
       - RABBIT_PORT=5672
       - RPC_QUEUE_NAME=rpcQueue
       - REPLY_QUEUE_NAME=replyQueue
+    restart: unless-stopped
     depends_on:
       redis:
         condition: service_healthy
