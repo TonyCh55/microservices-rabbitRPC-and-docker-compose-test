@@ -13,7 +13,7 @@ const {
 } = process.env
 
 export const config = {
-  port: PORT,
+  port: Number(PORT),
   rabbitMQ: {
     host: RABBIT_HOST,
     port: Number(RABBIT_PORT),
