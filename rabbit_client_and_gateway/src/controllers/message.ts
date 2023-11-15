@@ -1,3 +1,4 @@
+import { ClearDataModeType } from '@/types'
 import { Request, Response } from 'express'
 
 import { ClearDataModes } from '@/constants'
@@ -19,7 +20,7 @@ export class MessageController {
       }
     } catch (err) {
       console.error('MessageController: Error in sendSync', err)
-      res.status(500)
+      res.status(500).send('Somethig went wrong')
     }
   }
 
@@ -36,7 +37,7 @@ export class MessageController {
       }
     } catch (err) {
       console.error('MessageController: Error in sendAsync', err)
-      res.status(500)
+      res.status(500).send('Somethig went wrong')
     }
   }
 
@@ -51,28 +52,30 @@ export class MessageController {
       }
     } catch (err) {
       console.error('MessageController: Error in getOperationById', err)
-      res.status(500)
+      res.status(500).send('Somethig went wrong')
     }
   }
 
   public async clearData(req: Request, res: Response) {
+    const responses = {
+      [ClearDataModes.ASYNC]:
+        'All processed operations data was deleted, but inprogress operations was not affected',
+      [ClearDataModes.SYNC]: 'All operations data was deleted',
+    }
+
     try {
       const { mode } = req.body
 
       if (mode === ClearDataModes.ASYNC || mode === ClearDataModes.SYNC) {
         await messageService.clearData(mode)
 
-        res
-          .status(200)
-          .send(
-            'All processed operations data is deleted, but inprogress operations was not affected'
-          )
+        res.status(200).send(responses[mode])
       } else {
         res.status(400).send('Mode required! ASYNC or SYNC')
       }
     } catch (err) {
       console.error('MessageController: Error in clearData', err)
-      res.status(500)
+      res.status(500).send('Somethig went wrong').send('Somethig went wrong')
     }
   }
 }
