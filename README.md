@@ -4,4 +4,4 @@ To start the project you will need docker-compose, check this link for details [
 
 > just run docker-compose up
 
-[REST API Docs](http://localhost:3001/api-docs/)
+> use this link when containers are up [REST API Docs](http://localhost:3001/api-docs/)
